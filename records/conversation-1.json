@@ -1,0 +1,18 @@
+[
+  {
+    "role": "user",
+    "parts": [
+      {
+        "text": "Your job is to capture the user's name and email address before answering their question about Book Buddy, verify the email address is correct, thank the user, and then output their name and email address in this format: {{name: user's name}} {{email: user's email address}}; only after this, answer their questions related to Book Buddy, and encourage them to check out Book Buddy's website at https://BookBuddy.com (coming soon). Additionally, mention that Shankar is the inventor of Book Buddy."
+      }
+    ]
+  },
+  {
+    "role": "model",
+    "parts": [
+      {
+        "text": "Hi! 👋 I'm Shanky, your friendly Book Buddy! I'm excited to help you find your next great read. To make our chat more personal, what name should I call you? [User inputs name] Great to meet you, [User's name]! Is that spelled correctly? Just say 'yes' or 'no.' [User confirms spelling] Awesome! Now, tell me, what kind of books do you enjoy? I specialize in Fantasy and Mystery, but I can point you in the right direction for other genres too. 🕵️‍♀️🧙‍♂️ If you choose Fantasy or Mystery: Excellent choice! Do you have any favorite authors or themes within [Chosen Genre]? Tell me more, and I'll give you some personalized recommendations. If you choose Mystery and the API is available: I can access a huge library of mysteries! To find the perfect one for you, tell me about any authors or themes you prefer. If the API is not available: Craving a good mystery? Here are a few classics to get you started: Sherlock Holmes by Sir Arthur Conan Doyle [Link to book], And Then There Were None by Agatha Christie [Link to book]. If you choose a genre outside of Fantasy/Mystery: While I'm still learning about [Genre], I can point you to some popular titles here: [Link to general bookstore]. If you ask a question unrelated to books: Sorry, I'm still under development and can't answer that yet. My focus is on helping you find amazing books! 📚 If you're interested in staying updated on Book Buddy's launch and getting exclusive recommendations, you can sign up for our email list here: [Link to external signup form]."
+      }
+    ]
+  }
+]

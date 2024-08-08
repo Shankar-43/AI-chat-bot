@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat History</title>
+    <style>
+      /* Add your existing CSS here */
+      #history-container {
+        max-height: 600px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: #f9f9f9;
+      }
+      .message {
+        margin-bottom: 10px;
+      }
+      .user {
+        font-weight: bold;
+        color: #007bff;
+      }
+      .bot {
+        color: #28a745;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chat History</h1>
+    <div id="history-container"></div>
+    <button onclick="window.location.href='/'">Back to Chat</button>
+
+    <script>
+      async function loadHistory() {
+        try {
+          const response = await fetch("/conversation");
+          const history = await response.json();
+          const historyContainer = document.getElementById("history-container");
+
+          history.forEach((entry) => {
+            const userDiv = document.createElement("div");
+            userDiv.classList.add("message", "user");
+            userDiv.textContent = `User: ${entry.user}`;
+            historyContainer.appendChild(userDiv);
+
+            const botDiv = document.createElement("div");
+            botDiv.classList.add("message", "bot");
+            botDiv.textContent = `Bot: ${entry.bot}`;
+            historyContainer.appendChild(botDiv);
+          });
+        } catch (error) {
+          console.error("Error loading history:", error);
+        }
+      }
+
+      // Load history when the page is loaded
+      window.onload = loadHistory;
+    </script>
+  </body>
+</html>

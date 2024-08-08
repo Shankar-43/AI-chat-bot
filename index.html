@@ -10,18 +10,13 @@
         align-items: center;
         min-height: 100vh;
         background-image: url("https://images.unsplash.com/photo-1432821596592-e2c18b78144f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
-        background-size: cover; /* Cover the entire body */
-        background-position: center; /* Center the background */
-        background-repeat: no-repeat; /* Prevent repeating */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
       }
 
       #chat-container {
-        background-color: rgba(
-          255,
-          255,
-          255,
-          0.9
-        ); /* Semi-transparent background */
+        background-color: rgba(255, 255, 255, 0.9);
         border-radius: 10px;
         padding: 20px;
         box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
@@ -76,11 +71,15 @@
       }
 
       #loader {
-        display: none; /* Hide by default */
+        display: none;
+        justify-content: center;
+        align-items: center;
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* background-color: rgba(255, 255, 255, 0.8); */
       }
     </style>
   </head>
@@ -92,6 +91,17 @@
         <input type="text" id="user-input" placeholder="Enter your message" />
         <button type="submit">Send</button>
       </form>
+      <div id="buttons">
+        <button id="reset-btn">Delete Conversation</button>
+        <button id="new-convo-btn">New Conversation</button>
+        <!-- <button
+          id="view-history-btn"
+          onclick="window.location.href='/chat-history.html'"
+          style="display: block"
+        >
+          View History
+        </button> -->
+      </div>
     </div>
     <div id="loader">
       <img src="loader.gif" width="150px" alt="Loading..." />
@@ -100,11 +110,39 @@
       const chatHistory = document.getElementById("chat-history");
       const userInput = document.getElementById("user-input");
       const form = document.getElementById("chat-form");
+      const resetBtn = document.getElementById("reset-btn");
+      const newConvoBtn = document.getElementById("new-convo-btn");
+      const viewHistoryBtn = document.getElementById("view-history-btn");
+
+      async function checkHistory() {
+        try {
+          const response = await fetch("/has-history");
+          const data = await response.json();
+          if (data.hasFiles) {
+            viewHistoryBtn.style.display = "block";
+          } else {
+            viewHistoryBtn.style.display = "none";
+          }
+        } catch (error) {
+          console.error("Error checking history:", error);
+        }
+      }
 
       async function sendMessage() {
-        const userMessage = userInput.value;
-        userInput.value = ""; // Clear input field
-        console.log(userMessage);
+        const userMessage = userInput.value.trim();
+        if (!userMessage) return;
+
+        // Add user message to chat history
+        const userMessageElem = document.createElement("div");
+        userMessageElem.classList.add("user-message");
+        userMessageElem.textContent = userMessage;
+        chatHistory.appendChild(userMessageElem);
+        userInput.value = "";
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+        // Show loader while waiting for response
+        document.getElementById("loader").style.display = "flex";
+
         try {
           const response = await fetch("/chat", {
             method: "POST",
@@ -115,38 +153,53 @@
           });
 
           const data = await response.json();
-          console.log(data);
-          const botMessage = data.response;
-          console.log(botMessage);
-
-          // Add chat message to the chat history
-          chatHistory.innerHTML += `<div class="user-message">${userMessage}</div>`;
-
-          // Check if botMessage is undefined or null
-          if (!botMessage) {
-            chatHistory.innerHTML += `<div class="bot-message">Oops... Something went wrong!</div>`;
-          } else {
-            chatHistory.innerHTML += `<div class="bot-message">${botMessage}</div>`;
-          }
-
-          // Scroll to the bottom of the chat history
+          const botMessageElem = document.createElement("div");
+          botMessageElem.classList.add("bot-message");
+          botMessageElem.textContent = data.response;
+          chatHistory.appendChild(botMessageElem);
           chatHistory.scrollTop = chatHistory.scrollHeight;
+
+          // Re-check history after sending a message, to update button visibility
+          checkHistory();
         } catch (error) {
           console.error("Error:", error);
-          // Show user-friendly error message
-          chatHistory.innerHTML += `<div class="bot-message">Oops... Something went wrong!</div>`;
-          chatHistory.scrollTop = chatHistory.scrollHeight; // Scroll to the bottom
+        } finally {
+          // Hide loader after receiving response
+          document.getElementById("loader").style.display = "none";
         }
       }
 
       form.addEventListener("submit", (event) => {
-        event.preventDefault(); // Prevent form submission
-        const loader = document.getElementById("loader");
-        loader.style.display = "block"; // Show the loader
-        sendMessage().finally(() => {
-          loader.style.display = "none"; // Hide the loader after the message is sent
-        });
+        event.preventDefault();
+        sendMessage();
       });
+
+      resetBtn.addEventListener("click", async () => {
+        try {
+          const response = await fetch("/reset", { method: "POST" });
+          const data = await response.json();
+          alert(data.message);
+          chatHistory.innerHTML = ""; // Clear chat history on reset
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Failed to reset conversation.");
+        }
+      });
+
+      newConvoBtn.addEventListener("click", async () => {
+        try {
+          const response = await fetch("/new-conversation", { method: "POST" });
+          const data = await response.json();
+          alert(data.message);
+          chatHistory.innerHTML = ""; // Clear chat history for new conversation
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Failed to start new conversation.");
+        }
+      });
+
+      // Check if there are any conversation files on load
+      checkHistory();
     </script>
   </body>
 </html>
