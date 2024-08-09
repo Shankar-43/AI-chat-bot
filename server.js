@@ -133,7 +133,7 @@ app.post('/reset', (req, res) => {
 
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
-    res.json({ message: 'Conversation deleted successfully.' });
+    res.json({ message: 'Starting New Conversation.' });
   } else {
     res.json({ message: 'No conversation file to reset.' });
   }
